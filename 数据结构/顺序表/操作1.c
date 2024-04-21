@@ -4,63 +4,104 @@
 
 #define MAX 10
 
-typedef int datatype_t;
-
 typedef struct {
-    int id;
     char name[20];
+    int id;
     int score;
 } STU;
 
-typedef struct {
-    datatype_t buf[MAX]; // 定义数组存储数据
-    int n;               // 数组中有效元素个数
-} seqlist_t;
+typedef int datatype_t;
 
-seqlist_t *create_empty_list() {
-    seqlist_t* l = (seqlist_t *) malloc(sizeof(seqlist_t));
-    if (l == NULL) {
-        printf("Malloc error\n");
+typedef struct {
+    datatype_t buf[MAX];
+    int n;
+} Seqlist_t;
+
+Seqlist_t *Creat_empty_() {
+    Seqlist_t* l = (Seqlist_t *)malloc(sizeof(Seqlist_t));
+    if (NULL == l) {
+        printf("内存分配错误。");
         return NULL;
     }
-    memset(l, 0, sizeof(seqlist_t));
-    return l;
+    memset(l, 0, sizeof(Seqlist_t));
+    return l; // 不要忘记返回创建的列表
 }
 
-void insert(seqlist_t *l, datatype_t data) {
+void Insert_list(Seqlist_t *l, datatype_t data) {
     if (l->n < MAX) {
         l->buf[l->n] = data;
         l->n++;
     } else {
-        printf("List is full\n");
+        printf("列表已满！");
     }
 }
 
-void print_seqlist(seqlist_t *l) {
+int Full_list(Seqlist_t *l) {
+    return l->n == MAX ? 1 : 0;
+}
+
+int Empty_list(Seqlist_t *l) {
+    return l->n == 0 ? 1 : 0; 
+}
+
+void printf_list(Seqlist_t *l) {
     for (int i = 0; i < l->n; i++) {
-        printf("%d ", l->buf[i]);
+        printf("%d ",l->buf[i]);
     }
-    printf("\n");
 }
 
-int is_full_seqlist(seqlist_t *l) {
-    return l->n == MAX;
+int Delete_list(Seqlist_t *l, datatype_t data) {
+    if (Empty_list(l)) {
+        return -1; // 表示列表为空
+    }
+
+    int i = 0,j = 0;
+    for (int i = 0; i < l->n; i++) {
+        if (l->buf[i] != data) { // 假设根据学号删除
+            l->buf[j] = l->buf[i];
+            j++;
+        }
+    }
+
+    l->n = j;
+
+    if (i == j) {
+        return -2; // 表示未找到要删除的元素
+    } else {
+        printf("删除成功！\n");
+    }
+
+    return 0; // 表示成功
 }
 
 int main() {
-    seqlist_t *l = create_empty_list();
-    if (l == NULL) return -1;
-    
-    datatype_t data;
-    printf("Please enter numbers (up to 10):\n");
-    while (!is_full_seqlist(l)) {
-        if (scanf("%d", &data) != 1) {
-            printf("Invalid input\n");
-            break;
-        }
-        insert(l, data);
+    Seqlist_t *l = Creat_empty_();
+    if (NULL == l) {
+        return -1;
     }
-    print_seqlist(l);
+    int data;
+    int ret = 0;
+    printf("请输入10条记录：\n");
+    while(!Full_list(l)){
+        scanf("%d",&data);
+        Insert_list(l,data);
+    }
+    printf("==========================================\n");
+    printf("列表中的记录：\n");
+    printf_list(l);
+
+    printf("==========================================\n");
+    printf("请输入要删除的记录的学号：");
+    scanf("%d", &data);
+
+    ret = Delete_list(l, data);
+    if (ret < 0) {
+        printf("列表为空或未找到记录。\n");
+        return -1;
+    }
+    printf("更新后的列表：\n");
+    printf_list(l);
+
     free(l);
     l = NULL;
     return 0;
